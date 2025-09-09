@@ -37,7 +37,7 @@ import com.googleplacescompat.RNGooglePlacesPlaceFieldEnum.Companion.findByField
 import com.googleplacescompat.RNGooglePlacesPlaceTypeEnum.Companion.findByTypeId
 
 class RNGooglePlacesModule(private val reactContext: ReactApplicationContext) :
-  ReactContextBaseJavaModule(reactContext), ActivityEventListener {
+  NativeGooglePlacesCompatSpec(reactContext), ActivityEventListener {
 
   private var pendingPromise: Promise? = null
   private var lastSelectedFields: List<Place.Field>? = null
@@ -50,7 +50,7 @@ class RNGooglePlacesModule(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun initializePlaceClient(apiKey: String, sessionBasedAutocomplete: Boolean = false) {
+  override fun initializePlaceClient(apiKey: String, sessionBasedAutocomplete: Boolean) {
     if (!Places.isInitialized() && apiKey.isNotBlank()) {
       Places.initializeWithNewPlacesApiEnabled(reactContext.applicationContext, apiKey)
       placesClient = Places.createClient(reactContext.applicationContext)
@@ -96,19 +96,19 @@ class RNGooglePlacesModule(private val reactContext: ReactApplicationContext) :
    */
 
   @ReactMethod
-  fun refreshSessionToken() {
+  override fun refreshSessionToken() {
     if (sessionBasedAutoCompleteEnabled) {
       sessionToken = AutocompleteSessionToken.newInstance()
     }
   }
 
   @ReactMethod
-  fun setSessionBasedAutocomplete(enabled: Boolean) {
+  override fun setSessionBasedAutocomplete(enabled: Boolean) {
     sessionBasedAutoCompleteEnabled = enabled
   }
 
   @ReactMethod
-  fun openAutocompleteModal(options: ReadableMap, fields: ReadableArray, promise: Promise) {
+  override fun openAutocompleteModal(options: ReadableMap, fields: ReadableArray, promise: Promise) {
     if (!Places.isInitialized()) {
       promise.reject(
         "E_API_KEY_ERROR",
@@ -154,7 +154,7 @@ class RNGooglePlacesModule(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun getAutocompletePredictions(query: String?, options: ReadableMap, promise: Promise) {
+  override fun getAutocompletePredictions(query: String, options: ReadableMap, promise: Promise) {
     pendingPromise = promise
     if (!Places.isInitialized()) {
       promise.reject(
@@ -214,17 +214,13 @@ class RNGooglePlacesModule(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun lookUpPlaceByID(placeID: String?, fields: ReadableArray, promise: Promise) {
+  override fun lookUpPlaceByID(placeID: String, fields: ReadableArray, promise: Promise) {
     pendingPromise = promise
     if (!Places.isInitialized()) {
       promise.reject(
         "E_API_KEY_ERROR",
         Error("No API key defined in gradle.properties or errors initializing Places")
       )
-      return
-    }
-    if (placeID == null) {
-      promise.reject("E_PLACE_ID_ERROR", Error("Place ID is required"))
       return
     }
     val selectedFields = getPlaceFields(fields.toArrayList(), false)
@@ -255,7 +251,7 @@ class RNGooglePlacesModule(private val reactContext: ReactApplicationContext) :
 
   @ReactMethod
   @RequiresPermission(allOf = [permission.ACCESS_FINE_LOCATION, permission.ACCESS_WIFI_STATE])
-  fun getCurrentPlace(fields: ReadableArray, promise: Promise) {
+  override fun getCurrentPlace(fields: ReadableArray, promise: Promise) {
     if (ContextCompat.checkSelfPermission(
         reactContext.applicationContext,
         permission.ACCESS_WIFI_STATE

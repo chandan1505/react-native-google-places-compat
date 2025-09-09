@@ -163,5 +163,13 @@
         }
       ]
     ]
+  },
+  "codegenConfig": {
+    "name": "RNGooglePlacesCompatSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.googleplacescompat"
+    }
   }
 }

@@ -1,13 +1,11 @@
-// Assuming the interfaces and types from your index.d.ts or similar have been defined
-import { NativeModules } from 'react-native';
+// TurboModule implementation for Google Places Compat
+import NativeGooglePlacesCompat from './NativeGooglePlacesCompat';
 import type {
   GMSTypes,
   PlaceFields,
   CurrentPlace,
   RNGooglePlacesNativeOptions,
 } from './types';
-
-const RNGooglePlacesNative = NativeModules.RNGooglePlaces;
 
 const LOCATION_ONLY_FIELDS: PlaceFields[] = [
   'addressComponents',
@@ -46,7 +44,7 @@ class RNGooglePlaces {
     apiKey: string,
     sessionBasedAutocomplete: boolean = false
   ) {
-    RNGooglePlacesNative.initializePlaceClient(
+    return NativeGooglePlacesCompat.initializePlaceClient(
       apiKey,
       sessionBasedAutocomplete
     );
@@ -56,49 +54,49 @@ class RNGooglePlaces {
     options: Partial<RNGooglePlacesNativeOptions> = {},
     placeFields: PlaceFields[] = []
   ): Promise<GMSTypes.Place> {
-    return RNGooglePlacesNative.openAutocompleteModal(
+    return NativeGooglePlacesCompat.openAutocompleteModal(
       {
         ...RNGooglePlaces.optionsDefaults,
         ...options,
       },
       [...RNGooglePlaces.placeFieldsDefaults, ...placeFields]
-    );
+    ) as Promise<GMSTypes.Place>;
   }
 
   getAutocompletePredictions(
     query: string,
     options: Partial<RNGooglePlacesNativeOptions> = {}
   ): Promise<GMSTypes.AutocompletePrediction[]> {
-    return RNGooglePlacesNative.getAutocompletePredictions(query, {
+    return NativeGooglePlacesCompat.getAutocompletePredictions(query, {
       ...RNGooglePlaces.optionsDefaults,
       ...options,
-    });
+    }) as Promise<GMSTypes.AutocompletePrediction[]>;
   }
 
   lookUpPlaceByID(
     placeID: string,
     placeFields: PlaceFields[] = []
   ): Promise<GMSTypes.Place> {
-    return RNGooglePlacesNative.lookUpPlaceByID(placeID, [
+    return NativeGooglePlacesCompat.lookUpPlaceByID(placeID, [
       ...RNGooglePlaces.placeFieldsDefaults,
       ...placeFields,
-    ]);
+    ]) as Promise<GMSTypes.Place>;
   }
 
   getCurrentPlace(placeFields: PlaceFields[] = []): Promise<CurrentPlace[]> {
-    return RNGooglePlacesNative.getCurrentPlace([
+    return NativeGooglePlacesCompat.getCurrentPlace([
       ...RNGooglePlaces.placeFieldsDefaults,
       ...placeFields,
-    ]);
+    ]) as Promise<CurrentPlace[]>;
   }
 
   setSessionBasedAutocomplete(enabled: boolean) {
-    RNGooglePlacesNative.setSessionBasedAutocomplete(enabled);
+    NativeGooglePlacesCompat.setSessionBasedAutocomplete(enabled);
     this.refreshSessionToken();
   }
 
   refreshSessionToken() {
-    RNGooglePlacesNative.refreshSessionToken();
+    return NativeGooglePlacesCompat.refreshSessionToken();
   }
 }
 
