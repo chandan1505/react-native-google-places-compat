@@ -33,14 +33,14 @@ class RNGooglePlaces: NSObject, CLLocationManagerDelegate {
         return DispatchQueue.main
     }
 
-    @objc func initializePlaceClient(_ apiKey: String, sessionBasedAutocomplete: NSNumber) {
+    @objc func initializePlaceClient(_ apiKey: String, sessionBasedAutocomplete: Bool) {
         GMSPlacesClient.provideAPIKey(apiKey)
-        self.sessionBasedAutoCompleteEnabled = sessionBasedAutocomplete.boolValue
+        self.sessionBasedAutoCompleteEnabled = sessionBasedAutocomplete
         refreshSessionToken()
     }
 
-    @objc func setSessionBasedAutocomplete(_ enabled: NSNumber) {
-        sessionBasedAutoCompleteEnabled = enabled.boolValue
+    @objc func setSessionBasedAutocomplete(_ enabled: Bool) {
+        sessionBasedAutoCompleteEnabled = enabled
         if !sessionBasedAutoCompleteEnabled {
             token = nil
         }
@@ -54,7 +54,8 @@ class RNGooglePlaces: NSObject, CLLocationManagerDelegate {
         }
     }
 
-    @objc func openAutocompleteModal(_ options: NSDictionary, withFields fields: [String], resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc func openAutocompleteModal(_ options: NSDictionary, placeFields: NSArray, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        let fields = placeFields as? [String] ?? []
         do {
             // Assume RNGooglePlacesViewController has been translated to Swift
             let acController = RNGooglePlacesViewController()
@@ -75,7 +76,8 @@ class RNGooglePlaces: NSObject, CLLocationManagerDelegate {
         }
     }
 
-    @objc func getAutocompletePredictions(_ query: String, filterOptions: NSDictionary, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc func getAutocompletePredictions(_ query: String, options: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        let filterOptions = options
         var autoCompleteSuggestionsList = [[String: Any]]()
 
         // Create the autocomplete filter
@@ -124,7 +126,8 @@ class RNGooglePlaces: NSObject, CLLocationManagerDelegate {
         }
     }
 
-    @objc func lookUpPlaceByID(_ placeID: String, withFields fields: [String], resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc func lookUpPlaceByID(_ placeID: String, placeFields: NSArray, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        let fields = placeFields as? [String] ?? []
         
         let selectedFields = getSelectedFields(fields, isCurrentOrFetchPlace: false).map {$0.rawValue }
 
@@ -149,7 +152,8 @@ class RNGooglePlaces: NSObject, CLLocationManagerDelegate {
         self.refreshSessionToken()
     }
 
-    @objc func getCurrentPlace(_ fields: [String], resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc func getCurrentPlace(_ placeFields: NSArray, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        let fields = placeFields as? [String] ?? []
         self.locationManager.requestAlwaysAuthorization()
 
         let selectedFields = convertToPlaceField(getSelectedFields(fields, isCurrentOrFetchPlace: true))

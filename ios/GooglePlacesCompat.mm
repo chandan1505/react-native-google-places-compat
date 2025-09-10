@@ -1,31 +1,34 @@
 #import <React/RCTBridgeModule.h>
 
+#ifdef RCT_NEW_ARCH_ENABLED
+#import "RNGooglePlacesCompatSpec.h"
+#endif
+
 @interface RCT_EXTERN_MODULE(RNGooglePlaces, NSObject)
 
 RCT_EXTERN_METHOD(initializePlaceClient:(NSString *)apiKey
-                  sessionBasedAutocomplete:(nonnull NSNumber *)enabled)
-
+                  sessionBasedAutocomplete:(BOOL)sessionBasedAutocomplete)
 
 RCT_EXTERN_METHOD(openAutocompleteModal:(NSDictionary *)options
-                  withFields:(NSArray<NSString *> *)fields
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+                  placeFields:(NSArray *)placeFields
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(getAutocompletePredictions:(NSString *)query
-                  filterOptions:(NSDictionary *)filterOptions
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+                  options:(NSDictionary *)options
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(lookUpPlaceByID:(NSString *)placeID
-                  withFields:(NSArray<NSString *> *)fields
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+                  placeFields:(NSArray *)placeFields
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(getCurrentPlace:(NSArray<NSString *> *)fields
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getCurrentPlace:(NSArray *)placeFields
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(setSessionBasedAutocomplete:(nonnull NSNumber *)enabled)
+RCT_EXTERN_METHOD(setSessionBasedAutocomplete:(BOOL)enabled)
 
 RCT_EXTERN_METHOD(refreshSessionToken)
 
@@ -36,3 +39,8 @@ RCT_EXTERN_METHOD(refreshSessionToken)
 }
 
 @end
+
+#ifdef RCT_NEW_ARCH_ENABLED
+@interface RNGooglePlaces () <NativeGooglePlacesCompatSpec>
+@end
+#endif
