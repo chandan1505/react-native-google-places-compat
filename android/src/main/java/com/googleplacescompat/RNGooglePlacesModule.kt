@@ -126,7 +126,7 @@ class RNGooglePlacesModule(private val reactContext: ReactApplicationContext) :
 
     val typedOptions = options.getAutoCompletePredictionsOptions()
 
-    lastSelectedFields = getPlaceFields(fields.toArrayList(), false)
+    lastSelectedFields = getPlaceFields(fields.toArrayList() as ArrayList<Any>, false)
     val autocompleteIntent = Autocomplete.IntentBuilder(
       if (typedOptions.useOverlay) AutocompleteActivityMode.OVERLAY else AutocompleteActivityMode.FULLSCREEN,
       lastSelectedFields!!
@@ -223,7 +223,7 @@ class RNGooglePlacesModule(private val reactContext: ReactApplicationContext) :
       )
       return
     }
-    val selectedFields = getPlaceFields(fields.toArrayList(), false)
+    val selectedFields = getPlaceFields(fields.toArrayList() as ArrayList<Any>, false)
     val builder = FetchPlaceRequest.builder(placeID, selectedFields)
     if (sessionToken != null && sessionBasedAutoCompleteEnabled) {
       builder.sessionToken = sessionToken
@@ -269,7 +269,7 @@ class RNGooglePlacesModule(private val reactContext: ReactApplicationContext) :
       )
       return
     }
-    val selectedFields = getPlaceFields(fields.toArrayList(), true)
+    val selectedFields = getPlaceFields(fields.toArrayList() as ArrayList<Any>, true)
     if (checkPermission(permission.ACCESS_FINE_LOCATION)) {
       findCurrentPlaceWithPermissions(selectedFields, promise)
     }
